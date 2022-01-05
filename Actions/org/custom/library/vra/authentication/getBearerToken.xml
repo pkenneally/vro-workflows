@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getBearerToken" result-type="string" api-version="6.0.0" id="35129dee-510c-4fa5-a3b5-2abe676eb0a4" version="0.0.2" allowed-operations="vfe" category-name="org.custom.library.vra.authentication">
+  <description><![CDATA[Get an Bearer token for VMware Cloud Services. Second step of authentication process]]></description>
+  <param n="cspBaseUrl" t="string"><![CDATA[VMware Cloud Services API base URL]]></param>
+  <param n="cspRefreshToken" t="string"><![CDATA[VMware Cloud Services API Refresh token]]></param>
+  <param n="cspOpMethod" t="string"><![CDATA[VMware Cloud Services API Method]]></param>
+  <param n="cspOpContentType" t="string"><![CDATA[VMware Cloud Services API Header Method Content Type]]></param>
+  <param n="cspApiUrl" t="string"><![CDATA[VMware Cloud Services API url]]></param>
+  <script encoded="false"><![CDATA[// get action name for debug
+var actionName = arguments.callee.name.substr(6);
+try{ System.debug("[action-start] Starting action '"+actionName+"'"); var timeStart = new Date().getTime(); return main(); }
+finally{ System.debug("[action-end] Finished action '"+actionName+"' in "+(new Date().getTime()-timeStart)+"ms"); }
+
+
+// main of the action
+function main() {
+
+    if(!cspBaseUrl && !cspRefreshToken){
+            throw "Invalid arguments";
+    }
+    
+    if(!cspApiUrl){
+		cspApiUrl = "/iaas/login";
+	}
+    
+    if(!cspOpMethod){
+		cspOpMethod = "POST";
+	}
+
+    if(!cspOpContentType){
+        cspOpContentType = "application/json"
+    }
+
+    try{
+
+        var contentJson = {
+            "refreshToken": cspRefreshToken
+        }
+        var body = JSON.stringify(contentJson);
+
+        var opResponse  = System.getModule("org.custom.library.rest").executeTransientRESTOperation(cspBaseUrl, null, null, cspOpMethod, cspApiUrl, null, null, cspOpContentType, body);
+
+        if (opResponse.statusCode != 200) {
+            throw "Failed to get access token (" + opResponse.statusCode + " Error). Details: " + opResponse.responseString;
+        }
+
+        return JSON.parse(opResponse.responseString).token;
+    }
+    catch (ex){
+        throw ex;
+    }
+}
+
+///////////////////////////////	 functions here ///////////////////////////////	
+]]></script>
+</dunes-script-module>

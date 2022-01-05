@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="getRefreshToken" result-type="string" api-version="6.0.0" id="e53f8a82-8425-4b89-9ee1-33d582c4a642" version="0.0.3" allowed-operations="vfe" category-name="org.custom.library.vra.authentication">
+  <description><![CDATA[Get an Refresh token for VMware Cloud Services. First step of authentication process]]></description>
+  <param n="cspBaseUrl" t="string"><![CDATA[VMware Cloud Services API base URL]]></param>
+  <param n="cspOpMethod" t="string"><![CDATA[VMware Cloud Services API Method]]></param>
+  <param n="cspOpContentType" t="string"><![CDATA[VMware Cloud Services API Header Method Content Type]]></param>
+  <param n="cspUser" t="string"><![CDATA[VMware Cloud Services API User name]]></param>
+  <param n="cspPassword" t="SecureString"><![CDATA[VMware Cloud Services API User Password]]></param>
+  <param n="cspApiUrl" t="string"><![CDATA[VMware Cloud Services API Url]]></param>
+  <script encoded="false"><![CDATA[// get action name for debug
+var actionName = arguments.callee.name.substr(6);
+try{ System.debug("[action-start] Starting action '"+actionName+"'"); var timeStart = new Date().getTime(); return main(); }
+finally{ System.debug("[action-end] Finished action '"+actionName+"' in "+(new Date().getTime()-timeStart)+"ms"); }
+
+
+// main of the action
+function main() {
+
+    if(!cspBaseUrl  && !cspPassword && !cspUser){
+            throw "Invalid arguments";
+    }
+    
+    if(!cspApiUrl){
+		cspApiUrl = "/csp/gateway/am/api/login?access_token";
+	}
+    
+    if(!cspOpMethod){
+		cspOpMethod = "POST";
+	}
+
+    if(!cspOpContentType){
+        cspOpContentType = "application/json"
+    }
+
+    try{
+
+        var contentJson = {
+            "username": cspUser,
+            "password": cspPassword.toString()
+        }
+        var body = JSON.stringify(contentJson);
+
+        var opResponse  = System.getModule("org.custom.library.rest").executeTransientRESTOperation(cspBaseUrl, null, null, cspOpMethod, cspApiUrl, null, null, cspOpContentType, body);
+
+        if (opResponse.statusCode != 200) {
+            throw "Failed to get refresh token (" + opResponse.statusCode + " Error). Details: " + opResponse.responseString;
+        }
+
+        //System.debug('refreshToken:'+JSON.parse(opResponse.responseString).refresh_token);
+        return JSON.parse(opResponse.responseString).refresh_token;
+
+    }
+    catch (ex){
+        throw ex;
+    }
+}
+
+///////////////////////////////	 functions here ///////////////////////////////	]]></script>
+</dunes-script-module>

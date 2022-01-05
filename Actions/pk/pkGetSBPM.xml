@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="pkGetSBPM" result-type="string" api-version="6.0.0" id="c45b89d7-d1a6-47e8-bec6-72358bf961cc" version="0.0.0" category-name="pk">
+  <runtime><![CDATA[powercli:12-powershell-7.0]]></runtime>
+  <script encoded="false"><![CDATA[function Handler($context, $inputs) {
+    $inputsString = $inputs | ConvertTo-Json -Compress
+
+    Write-Host "Inputs were $inputsString"
+
+    $output=@{status = 'done'}
+
+    return $output
+}
+]]></script>
+</dunes-script-module>

@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dunes-script-module name="vraRest" result-type="Properties" api-version="6.0.0" id="946bcb9b-ce7e-4117-9594-36d9dedb55bf" version="0.0.5" allowed-operations="vfe" category-name="org.custom.library.vra">
+  <param n="cspOpUrl" t="string"><![CDATA[VMware Cloud Services API service URL]]></param>
+  <param n="cspOpMethod" t="string"><![CDATA[VMware Cloud Services API Method]]></param>
+  <param n="cspOpContentType" t="string"><![CDATA[VMware Cloud Services API Method Content Type]]></param>
+  <param n="cspUrlParamValues" t="string"><![CDATA[VMware Cloud Services API parameter value for operation]]></param>
+  <param n="cspContent" t="string"><![CDATA[VMware Cloud Services API content]]></param>
+  <param n="actionFolderPath" t="string"><![CDATA[VMware vRO Module folder which live customer constants]]></param>
+  <param n="debug" t="boolean"><![CDATA[Debug flag, allow to show API response]]></param>
+  <script encoded="false"><![CDATA[// get action name for debug
+var actionName = arguments.callee.name.substr(6);
+try{ System.debug("[action-start] Starting action '"+actionName+"'"); var timeStart = new Date().getTime(); return main(); }
+finally{ System.debug("[action-end] Finished action '"+actionName+"' in "+(new Date().getTime()-timeStart)+"ms"); }
+
+
+// main of the action
+function main() {
+    
+    if(!cspOpUrl){
+        throw "Invalid arguments, operation url (cspOpUrl) is undefined";
+	}
+    
+    if(!cspOpMethod){
+		throw "Invalid arguments, operation method (cspOpMethod) is undefined";
+	}
+
+    if(!actionFolderPath){
+        throw "Invalid arguments, Factory action folder path (actionFolderPath) is undefined";
+    }
+
+    if(!cspOpContentType){
+        cspOpContentType = "application/json"
+    }
+
+    try{
+
+        //Retrieve static configuration, customer centric, specific to each customer
+        const customerConfiguration = ConfigFactory(actionFolderPath.trim());
+        //Parse configuration
+        const cspUser = customerConfiguration.cspUser;
+        const cspPassword = customerConfiguration.cspPassword;
+        const cspBaseUrl = customerConfiguration.cspBaseUrl;
+
+        //Authentication to vRA Api
+        const cspAuthToken = getBearerToken(cspUser,cspPassword,cspBaseUrl);
+
+        // vRA authorization header
+        const cspHeaders = new Properties();
+        cspHeaders.put("Authorization", "Bearer " + cspAuthToken);
+
+        return System.getModule("org.custom.library.rest").executeTransientRESTOperation(cspBaseUrl, null, null, cspOpMethod, cspOpUrl, cspUrlParamValues, cspHeaders, cspOpContentType, cspContent);
+ 
+    }
+    catch (ex){
+        throw ex;
+    }
+}
+
+///////////////////////////////	 functions here ///////////////////////////////	
+
+function ConfigFactory(modulePath) {
+    try{
+
+        var regexOrgId = /-/gi;
+        var regexPrefix = /com./gi;
+
+        var prefix = modulePath.search(regexPrefix) ==-1 ? "com.": "";
+
+        var folderPath = modulePath.search(regexOrgId) != -1 ? prefix.concat(modulePath.replace(regexOrgId,".")).trim(): modulePath.trim();
+
+        return System.getModule(folderPath).vra8_rest_factory();
+    }
+    catch(e){
+        var exception = {
+            statusCode: null,
+            message: 'Failed to load customer configuration from module'+ folderPath+'vra8_rest_factory() . Details:'+e,
+            responseString: e
+        }
+        throw exception;
+    }
+}
+
+function getBearerToken(user, password, url){
+    try{
+        const refreshToken = System.getModule("org.custom.library.vra.authentication").getRefreshToken(url,null,null,user,password,null);
+        return System.getModule("org.custom.library.vra.authentication").getBearerToken(url, refreshToken, null, null, null);
+    }
+    catch(e){
+        var exception = {
+            statusCode: null,
+            message: 'Failed to authenticate to vRA Api.',
+            responseString: e
+        }
+
+        throw exception;
+    }
+}]]></script>
+</dunes-script-module>

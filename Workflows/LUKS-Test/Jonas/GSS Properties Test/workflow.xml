@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="170332a3-4733-4440-b8c7-3b11d459ab96" editor-version="2.0" version="0.0.1" api-version="6.0.0" allowed-operations="vef" restartMode="1" resumeFromFailedMode="0">
+    <display-name>GSS Properties Test</display-name>
+    <position y="50.0" x="100.0"/>
+    <input/>
+    <output/>
+    <attrib name="prop" type="Properties">
+        <value encoded="n">{}</value>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="300.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item0" type="task" comparator="0">
+        <display-name>Get Keys from Object</display-name>
+        <script encoded="false">// works
+prop.propKey1 = "propTest1";
+prop.propKey2 = "propTest2";
+System.log ("Prop type: "+typeof prop);
+System.log("Prop keys: "+prop.keys);
+System.log("Prop direct access: "+prop.propKey1+", "+prop.propKey2);
+
+// works
+var newProp = new Properties();
+newProp.newPropKey1 = "newPropTest1";
+newProp.newPropKey2 = "newPropTest2";
+System.log ("newProp type: "+typeof newProp);
+System.log("newProp keys: "+newProp.keys);
+System.log("newProp direct access: "+newProp.newPropKey1+", "+newProp.newPropKey2);
+
+// fails
+var obj = {};
+obj.key1 = "objTest1";
+obj.key2 = "objTest2";
+System.log ("Obj type: "+typeof obj);
+System.log("Obj keys: "+Object.keys(obj));
+System.log("obj direct access: "+obj.key1+", "+obj.key2);
+
+// fails
+var json = JSON.stringify(prop); // using 'prop' here from first test to show how thing which work previously, break
+var re = setJsonRe("Jonas_Test", json);
+System.log("Created JSON RE with content: "+json);
+var reObj = getJsonRe("Jonas_Test");
+System.log("Read JSON from RE: "+JSON.stringify(reObj));
+System.log ("reObj type: "+typeof reObj);
+System.log("reObj keys: "+Object.keys(reObj));
+System.log("reObj direct access: "+reObj.propKey1+", "+reObj.propKey1);
+Server.removeResourceElement(re);
+
+
+function setJsonRe (reName, reContent) {
+    // construct MIME attachment
+    var mimeAttachment = new MimeAttachment();
+    mimeAttachment.content = reContent;
+    mimeAttachment.mimeType = "application/json"; // vRO 8.x can preview application/json
+    mimeAttachment.name = reName;
+
+    // create RE
+    re = Server.createResourceElement("/web-root", reName, mimeAttachment, mimeAttachment.mimeType);
+    System.log("Successfully created JSON RE: "+reName);
+    return re
+}
+
+function getJsonRe (reName) {
+    var re = Server.findAllForType("ResourceElement", "name='"+reName+"'");
+    if (re.length == 1) {
+        re[0].reload();
+        return JSON.parse(re[0].getContentAsMimeAttachment().content);
+    } else {
+        throw "No or multiple JSON definition files named '"+reName+"' found!";
+    }
+}</script>
+        <in-binding>
+            <bind name="prop" type="Properties" export-name="prop"/>
+        </in-binding>
+        <out-binding/>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="160.0"/>
+    </workflow-item>
+</ns2:workflow>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<package>
+<elm src-category='null'><![CDATA[dunes://service.dunes.ch/Action?id='065fc313-cbd5-471f-aaab-1190cff0008d'&dunesName='Action'&name='getVraIaaSMachine'&category='org.custom.library.vra.iaas.machine']]></elm>
+<elm src-category='null'><![CDATA[dunes://service.dunes.ch/Action?id='946bcb9b-ce7e-4117-9594-36d9dedb55bf'&dunesName='Action'&name='vraRest'&category='org.custom.library.vra']]></elm>
+<elm src-category='null'><![CDATA[dunes://service.dunes.ch/Action?id='f5bbb734-6c7f-419a-8bfc-2fef20b42926'&dunesName='Action'&name='executeTransientRESTOperation'&category='org.custom.library.rest']]></elm>
+<elm src-category='null'><![CDATA[dunes://service.dunes.ch/Action?id='e53f8a82-8425-4b89-9ee1-33d582c4a642'&dunesName='Action'&name='getRefreshToken'&category='org.custom.library.vra.authentication']]></elm>
+<elm src-category='null'><![CDATA[dunes://service.dunes.ch/Action?id='35129dee-510c-4fa5-a3b5-2abe676eb0a4'&dunesName='Action'&name='getBearerToken'&category='org.custom.library.vra.authentication']]></elm>
+</package>
