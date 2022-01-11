@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<dunes-script-module name="getVraIaaSMachine" result-type="Any" api-version="6.0.0" id="065fc313-cbd5-471f-aaab-1190cff0008d" version="0.0.3" allowed-operations="vfe" category-name="org.custom.library.vra.iaas.machine">
+<dunes-script-module name="getVraIaaSMachine" result-type="Any" api-version="6.0.0" id="065fc313-cbd5-471f-aaab-1190cff0008d" version="0.0.11" allowed-operations="vfe" category-name="org.custom.library.vra.iaas.machine">
   <description><![CDATA[Returns a JSON object containing all iaas machine details]]></description>
   <param n="machineName" t="string"><![CDATA[Name of project (oData filter)]]></param>
   <param n="cspApiUrl" t="string"><![CDATA[VMware Cloud Services API service URL]]></param>
